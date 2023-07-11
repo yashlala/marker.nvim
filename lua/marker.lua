@@ -68,7 +68,7 @@ function M.del_bookmark()
     table.insert(names, key)
   end
 
-  vim.ui.select(names, { prompt = 'Delete bookmark (empty => current pos)' },
+  vim.ui.select(names, { prompt = 'Delete a bookmark: ' },
   function (choice, _)
     if not choice then
       return
