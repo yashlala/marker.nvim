@@ -19,6 +19,10 @@ function M.create_bookmark()
     if not name or name == nil then
       return
     end
+    if M.bookmarks[name] ~= nil then
+      print('Bookmark name already in use.')
+      return
+    end
 
     local line, column = unpack(vim.api.nvim_win_get_cursor(0))
     line = line - 1 -- API indexing inconsistencies
