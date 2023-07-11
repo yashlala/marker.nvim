@@ -6,7 +6,7 @@ M.ns = vim.api.nvim_create_namespace('marker')
 M.bookmarks = {}
 
 function M.create_bookmark()
-  vim.ui.input('Bookmark name?', function (name)
+  vim.ui.input({ prompt = 'Bookmark name? ' }, function (name)
     if not name or name == nil then
       return
     end
