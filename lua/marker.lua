@@ -1,9 +1,12 @@
 -- Marks, but you can use more than a single letter.
 
--- TODO:
--- - If a buffer's been been deleted, then delete the marks from that buffer.
--- - If it can be reopened, do so.
--- - Integrate with Telescope and the quickfix list.
+--[[
+TODO:
+- If a buffer's been been deleted, then delete the marks from that buffer.
+- If it can be reopened, do so.
+- Integrate with Telescope and the quickfix list.
+- Persistence by writing to swap file?
+]]
 
 local M = {}
 
