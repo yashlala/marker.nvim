@@ -69,10 +69,10 @@ function M.del_bookmark()
     if not choice then
       return
     end
-
     local bookmark = M.bookmarks[choice]
     assert(vim.api.nvim_buf_del_extmark(bookmark.bufnr, M.ns,
       bookmark.extmark_id), 'Bookmark not found!')
+    M.bookmarks[choice] = nil
   end)
 end
 
