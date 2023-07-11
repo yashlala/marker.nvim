@@ -1,9 +1,18 @@
-# Marks, but you can use more than a single letter.
+-- Marks, but you can use more than a single letter.
+
+-- TODO:
+-- - If a buffer's been been deleted, then delete the marks from that buffer.
+-- - If it can be reopened, do so.
+-- - Integrate with Telescope and the quickfix list.
 
 local M = {}
 
-M.ns = vim.api.nvim_create_namespace('marker')
-M.bookmarks = {}
+
+function M.setup()
+  M.ns = vim.api.nvim_create_namespace('marker')
+  M.bookmarks = {}
+end
+
 
 function M.create_bookmark()
   vim.ui.input({ prompt = 'Bookmark name? ' }, function (name)
@@ -17,32 +26,38 @@ function M.create_bookmark()
       { sign_text = '🏳️', ui_watched = true})
     M.bookmarks[name] = {
       bufnr = vim.api.nvim_get_current_buf(),
+      -- TODO: If the buf has been closed, use this to reopen it.
       buf_name = vim.api.nvim_buf_get_name(0),
       extmark_id = extmark_id,
     }
   end)
 end
 
+
 function M.goto_bookmark()
   local names = {}
   for key, _ in pairs(M.bookmarks) do
     table.insert(names, key)
   end
-  vim.ui.select(names, { prompt = 'Choose a bookmark:' },
+  vim.ui.select(names, { prompt = 'Choose a bookmark: ' },
   function (choice, _)
     if not names then
       return
     end
 
     local bookmark = M.bookmarks[choice]
-    local row, col = unpack(vim.api.nvim_buf_get_extmark_by_id(
-      bookmark.bufnr, M.ns, bookmark.extmark_id, {}))
-
+    local location = vim.api.nvim_buf_get_extmark_by_id(
+      bookmark.bufnr, M.ns, bookmark.extmark_id, {})
+    assert(not vim.tbl_isempty(location), 'No bookmark found!')
     vim.api.nvim_win_set_buf(0, bookmark.bufnr)
-    vim.api.nvim_win_set_cursor(0, {row + 1, col})
+    vim.api.nvim_win_set_cursor(0, {location[1] + 1, location[2]})
   end)
 end
 
+
+-- TODO: should this delete the mark from the current position?
+-- Or should it just delete the selected mark?
+-- How should we mass-delete marks? Via quickfix?
 function M.del_bookmark()
   local names = {}
   for key, _ in pairs(M.bookmarks) do
@@ -51,16 +66,13 @@ function M.del_bookmark()
 
   vim.ui.select(names, { prompt = 'Delete bookmark (empty => current pos)' },
   function (choice, _)
-    if not names then
+    if not choice then
       return
     end
 
     local bookmark = M.bookmarks[choice]
-    local row, col = unpack(vim.api.nvim_buf_get_extmark_by_id(
-      bookmark.bufnr, M.ns, bookmark.extmark_id, {}))
-
-    vim.api.nvim_win_set_buf(0, bookmark.bufnr)
-    vim.api.nvim_win_set_cursor(0, {row + 1, col})
+    assert(vim.api.nvim_buf_del_extmark(bookmark.bufnr, M.ns,
+      bookmark.extmark_id), 'Bookmark not found!')
   end)
 end
 
