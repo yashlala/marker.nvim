@@ -48,11 +48,11 @@ function M.goto_bookmark()
   end
   vim.ui.select(names, { prompt = 'Choose a bookmark: ' },
   function (choice, _)
-    if not names then
-      return
-    end
+    if not choice then return end
 
     local bookmark = M.bookmarks[choice]
+    if not bookmark then return end
+
     local location = vim.api.nvim_buf_get_extmark_by_id(
       bookmark.bufnr, M.ns, bookmark.extmark_id, {})
     assert(not vim.tbl_isempty(location), 'No bookmark found!')
